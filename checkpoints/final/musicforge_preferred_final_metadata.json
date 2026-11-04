@@ -1,0 +1,16 @@
+{
+    "project": "MusicForge AI",
+    "model": "Experiment 3 Extended",
+    "status": "FINALIZED",
+    "training_epochs": 55,
+    "dataset": "POP909",
+    "latent_dimension": 128,
+    "generator_parameters": 2164483,
+    "discriminator_parameters": 171617,
+    "discriminator_accuracy_percent": 74.41,
+    "real_class_precision_percent": 93.4,
+    "real_class_recall_percent": 52.54,
+    "real_class_f1_percent": 67.25,
+    "checkpoint": "/content/drive/MyDrive/MusicForge_AI_MuseGAN/checkpoints/final/musicforge_preferred_final_55_epochs.pth",
+    "finalized_at": "2026-11-04T17:14:45.720339"
+}

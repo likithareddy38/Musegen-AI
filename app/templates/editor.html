@@ -1,0 +1,60 @@
+
+{% extends "base.html" %}
+
+{% block title %}Piano Roll Editor | Musegen AI{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+{% endblock %}
+
+
+{% block content %}
+<section class="editor-page">
+
+    <div class="page-header">
+        <h1>Piano Roll Editor</h1>
+        <p>Edit your generated music note by note.</p>
+    </div>
+
+    
+    <div class="composition-selector">
+        <label for="composition-select">Load Composition</label>
+        <select id="composition-select">
+            <option value="">Select a composition...</option>
+        </select>
+        <button id="load-composition">Load into Editor</button>
+    </div>
+
+    <div class="editor-toolbar">
+        <div class="track-selector">
+            <button class="track-btn active" data-track="0">Melody</button>
+            <button class="track-btn" data-track="1">Bridge</button>
+            <button class="track-btn" data-track="2">Piano</button>
+        </div>
+
+        <div class="editor-actions">
+            <button id="play-composition">▶ Play</button>
+            <button id="stop-composition">■ Stop</button>
+            <button id="clear-track">Clear Track</button>
+            <button id="export-midi">⬇ Export MIDI</button>
+        </div>
+    </div>
+
+    <div class="piano-roll-container">
+
+        <div class="piano-labels" id="piano-labels"></div>
+
+        <div class="piano-grid-wrapper">
+            <div class="step-labels" id="step-labels"></div>
+            <div class="piano-grid" id="piano-grid"></div>
+        </div>
+
+    </div>
+
+    <div class="editor-footer">
+        <span id="note-count">Notes: 0</span>
+        <span>88 pitches · 32 steps</span>
+    </div>
+
+</section>
+{% endblock %}

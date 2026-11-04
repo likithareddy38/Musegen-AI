@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}My Creations | Musegen AI{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">YOUR MUSIC COLLECTION</p>
+            <h1>My Creations</h1>
+            <p>Every composition you generate, collected in one place.</p>
+        </div>
+        <a href="/studio" class="btn btn-primary">+ Create Music</a>
+    </div>
+
+    
+<div class="stats-grid" id="stats-grid">
+    <div class="stat-card">
+        <span>Total Compositions</span>
+        <strong id="stat-compositions">{{ total_compositions }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Total Music Duration</span>
+        <strong id="stat-duration">{{ (total_duration // 60)|int }}m {{ (total_duration % 60)|round|int }}s</strong>
+    </div>
+    <div class="stat-card">
+        <span>Average Tempo</span>
+        <strong id="stat-tempo">{{ average_tempo }} BPM</strong>
+    </div>
+    <div class="stat-card">
+        <span>Active Musical Cells</span>
+        <strong id="stat-cells">{{ "{:,}".format(total_active_cells) }}</strong>
+    </div>
+</div>
+
+<div class="library-toolbar">
+    <input type="search" id="creation-search"
+           placeholder="Search your music..."
+           aria-label="Search compositions">
+
+    <select id="creation-sort" aria-label="Sort compositions">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="tempo">Highest tempo</option>
+    </select>
+</div>
+
+<div id="library-status" class="library-status">
+        Loading your compositions...
+    </div>
+
+    <div id="creation-list" class="creation-grid"></div>
+</section>
+
+<style>
+.page-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 45px 24px;
+}
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 35px;
+}
+.eyebrow {
+    color: #b58aff;
+    letter-spacing: 3px;
+    font-size: 12px;
+}
+.creation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 22px;
+}
+.creation-card {
+    background: rgba(35,24,61,.75);
+    border: 1px solid rgba(181,138,255,.25);
+    border-radius: 16px;
+    padding: 22px;
+}
+.creation-card h3 { margin-top: 0; }
+.creation-meta {
+    color: #b9adc9;
+    font-size: 13px;
+    margin: 12px 0;
+}
+.creation-prompt {
+    color: #ddd3ed;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.creation-card audio {
+    width: 100%;
+    margin: 16px 0;
+}
+.creation-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.delete-creation-btn { color: #ff9cae; background: transparent; border: 1px solid #a94b68; padding: 9px 14px; border-radius: 8px; cursor: pointer; }\n.creation-actions a {
+    color: #d8c2ff;
+    text-decoration: none;
+    border: 1px solid rgba(181,138,255,.4);
+    padding: 9px 14px;
+    border-radius: 8px;
+}
+.library-toolbar {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.library-toolbar input,
+.library-toolbar select {
+    background: #211638;
+    color: #f2eaff;
+    border: 1px solid rgba(181,138,255,.4);
+    border-radius: 10px;
+    padding: 13px 15px;
+    font-size: 14px;
+}
+
+.library-toolbar input {
+    flex: 1;
+    min-width: 220px;
+}
+
+.library-toolbar select {
+    min-width: 170px;
+}
+
+.library-status {
+    color: #c5b6d9;
+    margin-bottom: 20px;
+}
+.empty-library {
+    padding: 35px;
+    border: 1px dashed #795ca0;
+    border-radius: 14px;
+    text-align: center;
+}
+@media(max-width:600px) {
+    .section-heading { align-items: flex-start; flex-direction: column; }
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+}
+.stat-card {
+    background: rgba(35,24,61,.85);
+    border: 1px solid rgba(181,138,255,.3);
+    border-radius: 14px;
+    padding: 22px;
+}
+.stat-card span {
+    display: block;
+    color: #b9adc9;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+.stat-card strong {
+    color: #d9baff;
+    font-size: 27px;
+}
+
+</style>
+
+<script>
+async function loadCreations() {
+    const status = document.getElementById("library-status");
+    const list = document.getElementById("creation-list");
+
+    try {
+        const response = await fetch("/api/creations");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || "Could not load creations.");
+        }
+
+        window.allCreations = data.creations || [];
+        renderCreations();
+
+        // Cards are rendered by renderCreations().
+
+
+    } catch (error) {
+        status.textContent = "Unable to load library: " + error.message;
+    }
+}
+
+
+async function deleteCreation(encodedId) {
+    const id = decodeURIComponent(encodedId);
+
+    if (!confirm("Are you sure you want to delete this composition?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            "/api/creations/" + encodeURIComponent(id),
+            { method: "DELETE" }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || "Deletion failed.");
+        }
+
+        loadCreations();
+
+
+
+    } catch (error) {
+        alert("Could not delete composition: " + error.message);
+    }
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+    })[char]);
+}
+
+function safeURL(value) {
+    const url = String(value || "");
+    return url.startsWith("/generated/") ? url : "#";
+}
+
+loadCreations();
+
+
+
+function renderCreations() {
+    const status = document.getElementById("library-status");
+    const list = document.getElementById("creation-list");
+    const search = document.getElementById("creation-search");
+    const sort = document.getElementById("creation-sort");
+
+    const query = (search?.value || "").toLowerCase().trim();
+    const sortMode = sort?.value || "newest";
+
+    let creations = [...(window.allCreations || [])];
+
+    creations = creations.filter(item =>
+        String(item.title || "").toLowerCase().includes(query) ||
+        String(item.prompt || "").toLowerCase().includes(query)
+    );
+
+    creations.sort((a, b) => {
+        if (sortMode === "tempo") {
+            return Number(b.tempo || 0) - Number(a.tempo || 0);
+        }
+
+        const dateA = new Date(a.created_at).getTime() || 0;
+        const dateB = new Date(b.created_at).getTime() || 0;
+
+        return sortMode === "oldest"
+            ? dateA - dateB
+            : dateB - dateA;
+    });
+
+    status.textContent =
+        creations.length + " composition(s) found";
+
+    if (creations.length === 0) {
+        list.innerHTML = `
+            <div class="empty-library">
+                <h3>No matching compositions found.</h3>
+                <p>Try another search or create new music.</p>
+            </div>`;
+        return;
+    }
+
+    list.innerHTML = creations.map(item => `
+        <article class="creation-card">
+            <h3>${escapeHTML(item.title)}</h3>
+            <div class="creation-meta">
+                ${item.tempo} BPM · ${item.duration} seconds
+            </div>
+            <p class="creation-prompt">
+                ${escapeHTML(item.prompt || "No description provided.")}
+            </p>
+            <div class="creation-meta">
+                Created: ${escapeHTML(item.created_at)}
+            </div>
+            <audio controls preload="metadata"
+                src="${safeURL(item.audio_url)}"></audio>
+            <div class="creation-meta">
+                Active cells: ${item.active_cells}
+            </div>
+            <div class="creation-actions">
+                <a href="${safeURL(item.midi_url)}" download>
+                    Download MIDI
+                </a>
+                <button type="button"
+                    onclick="deleteCreation('${encodeURIComponent(item.id)}')"
+                    class="delete-creation-btn">
+                    Delete
+                </button>
+            </div>
+        </article>
+    `).join("");
+}
+
+document.getElementById("creation-search")
+    ?.addEventListener("input", renderCreations);
+
+document.getElementById("creation-sort")
+    ?.addEventListener("change", renderCreations);
+
+async function loadStatistics() {
+    const ids = [
+        "stat-compositions",
+        "stat-duration",
+        "stat-tempo",
+        "stat-cells"
+    ];
+
+    try {
+        const response = await fetch("/api/statistics", {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("Statistics API returned " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || "Statistics unavailable");
+        }
+
+        document.getElementById("stat-compositions").textContent =
+            data.total_compositions;
+
+        document.getElementById("stat-duration").textContent =
+            Math.floor(data.total_duration / 60) + "m " +
+            Math.round(data.total_duration % 60) + "s";
+
+        document.getElementById("stat-tempo").textContent =
+            data.average_tempo + " BPM";
+
+        document.getElementById("stat-cells").textContent =
+            Number(data.total_active_cells).toLocaleString();
+
+    } catch (error) {
+        console.error("Musegen statistics error:", error);
+
+        ids.forEach(function(id) {
+            const element = document.getElementById(id);
+            if (element) element.textContent = "Unavailable";
+        });
+    }
+}
+
+loadStatistics();
+
+</script>
+{% endblock %}

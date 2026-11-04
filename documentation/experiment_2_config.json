@@ -1,0 +1,11 @@
+{
+    "experiment_name": "reduced_discriminator_learning_rate",
+    "baseline_epoch": 5,
+    "generator_lr": 0.0002,
+    "discriminator_lr": 0.0001,
+    "batch_size": 64,
+    "latent_dim": 128,
+    "epochs": 5,
+    "purpose": "Reduce discriminator dominance and evaluate latent diversity",
+    "preserve_baseline": true
+}

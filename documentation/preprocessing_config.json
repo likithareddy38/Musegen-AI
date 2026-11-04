@@ -1,0 +1,28 @@
+{
+    "project_name": "MusicForge AI",
+    "model": "MuseGAN",
+    "tracks": [
+        "MELODY",
+        "BRIDGE",
+        "PIANO"
+    ],
+    "num_tracks": 3,
+    "pitch_min": 21,
+    "pitch_max": 108,
+    "num_pitches": 88,
+    "time_signature": "2/4",
+    "subdivisions_per_beat": 4,
+    "beats_per_bar": 2,
+    "steps_per_bar": 8,
+    "bars_per_segment": 4,
+    "steps_per_segment": 32,
+    "segment_shape": [
+        3,
+        88,
+        32
+    ],
+    "encoding": "binary_piano_roll",
+    "preserve_tempo": true,
+    "dataset": "POP909",
+    "total_songs": 909
+}

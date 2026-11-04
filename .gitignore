@@ -1,0 +1,49 @@
+# Training datasets
+datasets/
+*.npy
+*.npz
+
+# Generated music files
+app/generated/*
+!app/generated/.gitkeep
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Notebook and editor files
+.ipynb_checkpoints/
+.vscode/
+.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Git LFS temporary files
+.lfsconfig
+
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+credentials.json
+
+# Experimental checkpoints
+checkpoints/*
+!checkpoints/final/
+checkpoints/final/*
+!checkpoints/final/musicforge_preferred_final_55_epochs.pth
+!checkpoints/final/musicforge_preferred_final_metadata.json
+
+# Training outputs and sample music
+results/
+datasets/

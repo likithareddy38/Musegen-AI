@@ -1,0 +1,13 @@
+{
+    "project_name": "MusicForge AI",
+    "model": "MuseGAN",
+    "generation_tracks": [
+        "Melody",
+        "Bridge",
+        "Piano"
+    ],
+    "num_tracks": 3,
+    "dataset": "POP909",
+    "training_environment": "Google Colab GPU",
+    "status": "Initial setup"
+}

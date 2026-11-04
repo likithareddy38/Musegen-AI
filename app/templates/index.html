@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Musegen AI{% endblock %}
+{% block content %}
+<section class="hero">
+    <div>
+        <div class="eyebrow">✦ YOUR NEXT SOUND STARTS HERE</div>
+        <h1>CREATE MUSIC.<br><span>BREAK LIMITS.</span></h1>
+        <p class="muted">Turn your imagination into original musical compositions.</p>
+        <a class="button" href="{{ url_for('studio') }}">✦ OPEN AI MUSIC STUDIO</a>
+    </div>
+    <div class="hero-orb">♫</div>
+</section>
+
+<div class="grid two">
+    <section class="card">
+        <div class="eyebrow">YOUR CREATIVE SPACE</div>
+        <h2>Text to Music</h2>
+        <p class="muted">Describe the music you imagine and create your next composition.</p>
+        <a class="button" href="{{ url_for('studio') }}">START CREATING →</a>
+    </section>
+    <section class="card">
+        <div class="eyebrow">MUSIC WORKSPACE</div>
+        <h2>Three-track compositions</h2>
+        <div class="track"><span>● &nbsp; Melody</span><span>TRACK 01</span></div>
+        <div class="track"><span>● &nbsp; Bridge</span><span>TRACK 02</span></div>
+        <div class="track"><span>● &nbsp; Piano</span><span>TRACK 03</span></div>
+    </section>
+</div>
+{% endblock %}

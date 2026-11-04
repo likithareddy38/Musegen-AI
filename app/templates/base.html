@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Musegen AI{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+    <a href="{{ url_for('home') }}" class="brand">
+        MUSEGEN<span> AI</span>
+        <small>INTELLIGENT MUSIC LAB</small>
+    </a>
+
+    <div class="nav-label">WORKSPACE</div>
+    <a class="nav-item {% if page == 'home' %}active{% endif %}" href="{{ url_for('home') }}">◈ &nbsp; Dashboard</a>
+    <a class="nav-item {% if page == 'studio' %}active{% endif %}" href="{{ url_for('studio') }}">♫ &nbsp; AI Music Studio</a>
+    <a class="nav-item {% if page == 'creations' %}active{% endif %}" href="{{ url_for('creations') }}">▤ &nbsp; My Creations</a>
+    <a class="nav-item {% if page == 'editor' %}active{% endif %}" href="{{ url_for('editor') }}">🎹 &nbsp; Piano Roll Editor</a>
+
+    <div class="nav-label">LIBRARY</div>
+    <a class="nav-item {% if page == 'player' %}active{% endif %}" href="{{ url_for('player') }}">◉ &nbsp; Audio Player</a>
+    <a class="nav-item {% if page == 'exports' %}active{% endif %}" href="{{ url_for('exports') }}">⇩ &nbsp; Exports</a>
+
+    <div class="nav-label">SYSTEM</div>
+    <a class="nav-item {% if page == 'about' %}active{% endif %}" href="{{ url_for('about') }}">⌘ &nbsp; About Musegen</a>
+
+    <div class="sidebar-bottom">
+        <span class="status-dot"></span> Interface online
+        <small>Your creative music laboratory</small>
+    </div>
+</aside>
+
+<main class="main">
+    <header class="topbar">
+        <div class="breadcrumb">MUSEGEN AI / {{ page|upper }}</div>
+        <div class="profile">✦ &nbsp; MUSIC CREATOR</div>
+    </header>
+    {% block content %}{% endblock %}
+    <footer>MUSEGEN AI · INTELLIGENT MUSIC GENERATION</footer>
+</main>
+</div>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

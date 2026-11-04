@@ -1,0 +1,16 @@
+{
+    "model": "MusicForge MuseGAN-inspired GAN",
+    "latent_dim": 128,
+    "batch_size": 64,
+    "epochs": 100,
+    "generator_lr": 0.0002,
+    "discriminator_lr": 0.0002,
+    "adam_beta1": 0.5,
+    "adam_beta2": 0.999,
+    "loss": "BCEWithLogitsLoss",
+    "generator_output": "Sigmoid probabilities",
+    "label_smoothing": 0.9,
+    "checkpoint_frequency": 5,
+    "seed": 42,
+    "device": "cuda"
+}

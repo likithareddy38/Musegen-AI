@@ -1,0 +1,180 @@
+
+{% extends "base.html" %}
+{% block title %}AI Music Studio | Musegen AI{% endblock %}
+
+{% block content %}
+
+<div class="page-heading">
+    <div class="eyebrow">✦ YOUR PERSONAL AI COMPOSER</div>
+    <h1>TEXT TO <span>MUSIC</span></h1>
+    <p class="muted">
+        Describe your musical idea and generate a new instrumental composition.
+    </p>
+</div>
+
+<section class="card prompt-card">
+    <label class="field-label" for="prompt">DESCRIBE YOUR MUSIC</label>
+
+    <textarea id="prompt" rows="5" maxlength="1000"
+      placeholder="Example: Create a peaceful cinematic piano melody for a rainy evening..."></textarea>
+
+    <div class="prompt-bottom">
+        <span class="muted" id="char-count">0 / 1000 characters</span>
+
+        <button class="button" id="generate-button"
+                type="button" onclick="submitPrompt()">
+            ✦ GENERATE MUSIC
+        </button>
+    </div>
+
+    <p id="prompt-status" class="muted status-message">
+        Your description will be saved with your creation.
+        The current MuseGAN generates music independently of the text.
+    </p>
+</section>
+
+<div class="grid two">
+
+    <section class="card">
+        <div class="eyebrow">PROMPT INSPIRATION</div>
+        <h2>Try an idea</h2>
+
+        <button class="prompt-example"
+          onclick="usePrompt('Create relaxing piano music for a quiet rainy evening.')">
+          🌧 Relaxing rainy evening
+        </button>
+
+        <button class="prompt-example"
+          onclick="usePrompt('Create energetic pop music with a catchy melody and uplifting atmosphere.')">
+          ⚡ Energetic pop music
+        </button>
+
+        <button class="prompt-example"
+          onclick="usePrompt('Create peaceful cinematic background music with emotional piano melodies.')">
+          🌌 Cinematic atmosphere
+        </button>
+
+        <button class="prompt-example"
+          onclick="usePrompt('Create cheerful instrumental music for a sunny morning.')">
+          ☀ Cheerful morning
+        </button>
+    </section>
+
+    <section class="card">
+        <div class="eyebrow">ARRANGEMENT</div>
+        <h2>Your music tracks</h2>
+
+        <div class="track"><span>● &nbsp; Melody</span><span>TRACK 01</span></div>
+        <div class="track"><span>● &nbsp; Bridge</span><span>TRACK 02</span></div>
+        <div class="track"><span>● &nbsp; Piano</span><span>TRACK 03</span></div>
+
+        <p class="muted">Three-track instrumental arrangement.</p>
+    </section>
+
+</div>
+
+<section class="card" id="result-card" style="display:none; margin-top:24px;">
+    <div class="eyebrow">✦ YOUR NEW CREATION</div>
+    <h2 id="result-title">Composition generated</h2>
+
+    <audio id="generated-audio" controls
+           style="width:100%; margin:16px 0;"></audio>
+
+    <p class="muted" id="result-details"></p>
+
+    <a id="midi-download" class="button"
+       href="#" download>
+       ↓ DOWNLOAD MIDI
+    </a>
+</section>
+
+<script>
+const promptBox = document.getElementById("prompt");
+const count = document.getElementById("char-count");
+const status = document.getElementById("prompt-status");
+const generateButton = document.getElementById("generate-button");
+
+promptBox.addEventListener("input", () => {
+    count.textContent =
+        promptBox.value.length + " / 1000 characters";
+});
+
+function usePrompt(value) {
+    promptBox.value = value;
+    promptBox.dispatchEvent(new Event("input"));
+    promptBox.focus();
+}
+
+async function submitPrompt() {
+    const value = promptBox.value.trim();
+
+    if (!value) {
+        status.textContent =
+            "Please describe the music you want to create.";
+        return;
+    }
+
+    generateButton.disabled = true;
+    generateButton.textContent = "GENERATING...";
+    status.textContent =
+        "Your composition is being generated. Please wait...";
+
+    try {
+        const response = await fetch("/api/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                prompt: value,
+                tempo: 120
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.error || "Music generation failed."
+            );
+        }
+
+        const audio = document.getElementById("generated-audio");
+        const resultCard = document.getElementById("result-card");
+        const midiDownload = document.getElementById("midi-download");
+
+        audio.src = result.audio_url;
+        audio.load();
+
+        midiDownload.href = result.midi_url;
+
+        document.getElementById("result-title").textContent =
+            "Your composition is ready!";
+
+        document.getElementById("result-details").textContent =
+            "Duration: " + result.duration + " seconds | " +
+            "Active cells: " + result.active_cells +
+            " | Melody: " + result.track_notes[0] +
+            " | Bridge: " + result.track_notes[1] +
+            " | Piano: " + result.track_notes[2];
+
+        resultCard.style.display = "block";
+
+        status.textContent =
+            "Generation successful! Your composition is ready to play.";
+
+        resultCard.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+    } catch (error) {
+        status.textContent = "Error: " + error.message;
+    } finally {
+        generateButton.disabled = false;
+        generateButton.textContent = "✦ GENERATE MUSIC";
+    }
+}
+</script>
+
+{% endblock %}

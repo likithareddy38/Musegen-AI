@@ -1,0 +1,19 @@
+{
+    "phase": "controlled_training",
+    "start_epoch": 1,
+    "end_epoch": 5,
+    "total_epochs": 5,
+    "checkpoint_frequency": 1,
+    "batch_size": 64,
+    "latent_dim": 128,
+    "generator_lr": 0.0002,
+    "discriminator_lr": 0.0002,
+    "device": "cuda",
+    "monitor_tracks": [
+        "Melody",
+        "Bridge",
+        "Piano"
+    ],
+    "monitor_activation": true,
+    "monitor_empty_segments": true
+}
