@@ -6,3 +6,5 @@ scipy
 torch
 
 soundfile
+
+pyfluidsynth
