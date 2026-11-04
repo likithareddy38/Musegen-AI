@@ -4,3 +4,5 @@ numpy
 pretty_midi
 scipy
 torch
+
+soundfile
