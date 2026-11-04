@@ -5,6 +5,6 @@ pretty_midi
 scipy
 torch
 
-soundfile
 
 pyfluidsynth
+soundfile
