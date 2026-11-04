@@ -218,3 +218,335 @@ footer{text-align:center;color:#746681;font-size:10px;padding:35px 0 10px}
         height: 450px;
     }
 }
+
+
+
+/* =====================================
+   MUSEGEN AI PREMIUM AUDIO PLAYER
+===================================== */
+
+.music-player-page {
+    padding: 15px 1%;
+}
+
+.music-player-page .page-heading {
+    margin-bottom: 30px;
+}
+
+.music-player-page .page-heading h1 span {
+    background: linear-gradient(90deg,#c084fc,#f0abfc);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.music-player-layout {
+    display: grid;
+    grid-template-columns: minmax(0,1.2fr) minmax(300px,0.8fr);
+    gap: 22px;
+    align-items: stretch;
+}
+
+.player-main {
+    text-align: center;
+    padding: 30px;
+}
+
+.player-artwork {
+    position: relative;
+    width: min(100%,290px);
+    aspect-ratio: 1;
+    margin: 0 auto 30px;
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 30% 30%,#e879f9 0%,transparent 30%),
+        radial-gradient(circle at 75% 70%,#7e22ce 0%,transparent 40%),
+        linear-gradient(135deg,#28103e,#090611);
+    border: 1px solid #c084fc66;
+    box-shadow: 0 0 55px #a855f733;
+}
+
+.artwork-glow {
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    border: 1px solid #e9b8ff66;
+    border-radius: 50%;
+    box-shadow: 0 0 35px #c084fc77,inset 0 0 35px #c084fc55;
+    animation: artworkPulse 4s ease-in-out infinite;
+}
+
+.artwork-icon {
+    z-index: 1;
+    font-size: 100px;
+    color: #f5d0fe;
+    text-shadow: 0 0 35px #e879f9;
+}
+
+.artwork-caption {
+    z-index: 1;
+    margin-top: 10px;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #e9d5ff;
+}
+
+@keyframes artworkPulse {
+    0%,100% {transform:scale(.92);opacity:.65}
+    50% {transform:scale(1.08);opacity:1}
+}
+
+.player-track-info h2 {
+    font-size: 21px;
+    margin: 10px 0;
+    overflow-wrap: anywhere;
+}
+
+.player-track-info .muted {
+    max-width: 480px;
+    margin: auto;
+    overflow-wrap: anywhere;
+}
+
+.audio-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+    font-size: 10px;
+    color: #bcaaca;
+    font-variant-numeric: tabular-nums;
+}
+
+.audio-progress input,
+.player-volume input {
+    flex: 1;
+    min-width: 0;
+    accent-color: #c084fc;
+    cursor: pointer;
+}
+
+.player-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(10px,3vw,23px);
+    margin: 24px 0;
+}
+
+.player-controls button {
+    border: 0;
+    background: transparent;
+    color: #d8b4fe;
+    font-size: 22px;
+    cursor: pointer;
+    min-width: 32px;
+    transition: .2s;
+}
+
+.player-controls button:hover,
+.player-controls button.control-active {
+    color: #f0abfc;
+    text-shadow: 0 0 15px #c084fc;
+}
+
+.player-controls .main-play-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    color: white;
+    font-size: 25px;
+    background: linear-gradient(135deg,#9333ea,#c026d3);
+    box-shadow: 0 0 28px #a855f766;
+}
+
+.player-controls .main-play-btn:hover {
+    transform: scale(1.08);
+}
+
+.player-volume {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 280px;
+    margin: 0 auto 28px;
+    font-size: 13px;
+    color: #c4b5d0;
+}
+
+.player-volume input {
+    max-width: 180px;
+}
+
+.player-details {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+}
+
+.player-details div {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.player-details small {
+    font-size: 9px;
+    color: #9885a9;
+    letter-spacing: 1.5px;
+}
+
+.player-details strong {
+    font-size: 12px;
+    color: #e9d5ff;
+}
+
+.playlist-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.playlist-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.playlist-heading h2 {
+    margin-bottom: 0;
+}
+
+.library-count {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #e9b8ff;
+    background: #a855f722;
+    padding: 8px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.playlist-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    flex: 1;
+}
+
+.playlist-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 14px 12px;
+    text-align: left;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: #0e0a17;
+    color: var(--text);
+    cursor: pointer;
+    transition: .2s;
+}
+
+.playlist-item:hover {
+    background: #251533;
+    border-color: #7542a1;
+}
+
+.playlist-item.selected {
+    background: #321b48;
+    border-color: #a855f7;
+}
+
+.playlist-number {
+    color: #a78bbd;
+    font-size: 11px;
+    min-width: 20px;
+}
+
+.playlist-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.playlist-info strong {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.playlist-info small {
+    font-size: 10px;
+    color: #a395b6;
+}
+
+.playlist-play-icon {
+    color: #d8b4fe;
+    font-size: 14px;
+}
+
+.playlist-footer {
+    margin-top: 25px;
+}
+
+.playlist-footer .button {
+    display: block;
+    text-align: center;
+}
+
+.player-status {
+    margin-top: 18px;
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #171023;
+    color: #d8b4fe;
+    font-size: 11px;
+}
+
+@media(max-width:950px) {
+    .music-player-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:620px) {
+    .music-player-page {
+        padding: 10px 0;
+    }
+
+    .player-main {
+        padding: 20px 14px;
+    }
+
+    .player-artwork {
+        width: min(100%,230px);
+    }
+
+    .artwork-icon {
+        font-size: 80px;
+    }
+
+    .player-details strong {
+        font-size: 10px;
+    }
+
+    .playlist-panel {
+        min-height: 350px;
+    }
+}
+
