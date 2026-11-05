@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, jsonify, request, send_from_directory
 
 from app.utils.music_generator import generate_music
-from app.utils.midi_editor import midi_to_piano_roll
+from app.utils.midi_editor import midi_to_piano_roll, midi_track_metadata
 from app.utils.creation_history import load_creation_history, save_creation
 from app.utils.creation_history import save_creation
 
@@ -70,6 +70,19 @@ def api_generate():
         data = request.get_json(silent=True) or {}
 
         tempo = int(data.get("tempo", 120))
+        duration = float(data.get("duration", 30))
+        genre = data.get("genre", "Classical")
+        mood = data.get("mood", "Happy")
+        instruments = data.get(
+            "instruments",
+            ["Piano", "Violin", "Strings"]
+        )
+
+        if not isinstance(instruments, list):
+            return jsonify({
+                "success": False,
+                "error": "Instruments must be provided as a list."
+            }), 400
 
         if not 60 <= tempo <= 180:
             return jsonify({
@@ -77,7 +90,20 @@ def api_generate():
                 "error": "Tempo must be between 60 and 180 BPM."
             }), 400
 
-        result = generate_music(tempo=tempo)
+        if not 10 <= duration <= 180:
+            return jsonify({
+                "success": False,
+                "error": "Duration must be between 10 and 180 seconds."
+            }), 400
+
+        result = generate_music(
+            tempo=tempo,
+            duration=duration,
+            genre=genre,
+            mood=mood,
+            instruments=instruments
+        )
+
         creation = save_creation(
             prompt=data.get("prompt", ""),
             tempo=tempo,
@@ -91,6 +117,9 @@ def api_generate():
             "title": creation["title"],
             "prompt": creation["prompt"],
             "tempo": creation["tempo"],
+            "genre": genre,
+            "mood": mood,
+            "instruments": instruments,
             "created_at": creation["created_at"],
             "midi_url": f"/generated/{result['midi_filename']}",
             "audio_url": f"/generated/{result['wav_filename']}",
@@ -98,6 +127,12 @@ def api_generate():
             "active_cells": result["active_cells"],
             "track_notes": result["track_notes"]
         })
+
+    except (ValueError, TypeError) as error:
+        return jsonify({
+            "success": False,
+            "error": str(error)
+        }), 400
 
     except Exception as error:
         app.logger.exception("Music generation failed")
@@ -285,12 +320,15 @@ def load_editor_composition(creation_id):
 
     try:
         piano_roll = midi_to_piano_roll(midi_path)
+        metadata = midi_track_metadata(midi_path)
 
         return jsonify({
             "id": creation_id,
             "title": composition.get("title"),
             "tempo": composition.get("tempo", 120),
-            "piano_roll": piano_roll.tolist()
+            "piano_roll": piano_roll.tolist(),
+            "track_names": metadata["track_names"],
+            "programs": metadata["programs"]
         })
 
     except Exception as error:
@@ -312,9 +350,13 @@ def export_editor_midi():
             dtype=np.float32
         )
 
-        if piano_roll.shape != (3, 88, 32):
+        if (
+            piano_roll.ndim != 3
+            or piano_roll.shape[1:] != (88, 32)
+            or not 1 <= piano_roll.shape[0] <= 15
+        ):
             return jsonify({
-                "error": "Expected piano roll dimensions (3, 88, 32)."
+                "error": "Expected piano roll dimensions (1-15, 88, 32)."
             }), 400
 
         if not np.isfinite(piano_roll).all():
@@ -336,7 +378,9 @@ def export_editor_midi():
 
         result = piano_roll_to_midi(
             piano_roll,
-            tempo=tempo
+            tempo=tempo,
+            track_names=data.get("track_names"),
+            programs=data.get("programs")
         )
 
         return jsonify({

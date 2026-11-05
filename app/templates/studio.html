@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% block title %}AI Music Studio | Musegen AI{% endblock %}
 
@@ -8,7 +7,7 @@
     <div class="eyebrow">✦ YOUR PERSONAL AI COMPOSER</div>
     <h1>TEXT TO <span>MUSIC</span></h1>
     <p class="muted">
-        Describe your musical idea and generate a new instrumental composition.
+        Describe your musical idea and customize your instrumental composition.
     </p>
 </div>
 
@@ -20,20 +19,92 @@
 
     <div class="prompt-bottom">
         <span class="muted" id="char-count">0 / 1000 characters</span>
+    </div>
+</section>
 
+<section class="card" style="margin-top:24px;">
+    <div class="eyebrow">✦ CUSTOMIZE YOUR COMPOSITION</div>
+    <h2>Generation settings</h2>
+
+    <div class="grid two">
+        <div>
+            <label class="field-label" for="genre">GENRE</label>
+            <select id="genre">
+                <option>Classical</option>
+                <option>Pop</option>
+                <option>Jazz</option>
+                <option>EDM</option>
+                <option>Lo-fi</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="field-label" for="mood">MOOD</label>
+            <select id="mood">
+                <option>Happy</option>
+                <option>Sad</option>
+                <option>Romantic</option>
+                <option>Energetic</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="field-label" for="tempo">
+                TEMPO: <span id="tempo-value">120 BPM</span>
+            </label>
+            <input type="range" id="tempo" min="60" max="180" value="120"
+                   oninput="document.getElementById('tempo-value').textContent=this.value+' BPM'">
+        </div>
+
+        <div>
+            <label class="field-label" for="duration">DURATION</label>
+            <select id="duration">
+                <option value="15">15 seconds</option>
+                <option value="30" selected>30 seconds</option>
+                <option value="60">1 minute</option>
+                <option value="90">1 minute 30 seconds</option>
+                <option value="120">2 minutes</option>
+                <option value="180">3 minutes</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="margin-top:24px;">
+        <label class="field-label">SELECT YOUR INSTRUMENTS</label>
+
+        <div class="grid two" id="instrument-options">
+            <label><input type="checkbox" name="instrument" value="Piano" checked> Piano</label>
+            <label><input type="checkbox" name="instrument" value="Bright Piano"> Bright Piano</label>
+            <label><input type="checkbox" name="instrument" value="Music Box"> Music Box</label>
+            <label><input type="checkbox" name="instrument" value="Guitar"> Guitar</label>
+            <label><input type="checkbox" name="instrument" value="Acoustic Guitar"> Acoustic Guitar</label>
+            <label><input type="checkbox" name="instrument" value="Bass"> Bass</label>
+            <label><input type="checkbox" name="instrument" value="Violin" checked> Violin</label>
+            <label><input type="checkbox" name="instrument" value="Viola"> Viola</label>
+            <label><input type="checkbox" name="instrument" value="Cello"> Cello</label>
+            <label><input type="checkbox" name="instrument" value="Strings" checked> Strings</label>
+            <label><input type="checkbox" name="instrument" value="Choir"> Choir</label>
+            <label><input type="checkbox" name="instrument" value="Trumpet"> Trumpet</label>
+            <label><input type="checkbox" name="instrument" value="Flute"> Flute</label>
+            <label><input type="checkbox" name="instrument" value="Synth Lead"> Synth Lead</label>
+            <label><input type="checkbox" name="instrument" value="Synth Pad"> Synth Pad</label>
+        </div>
+
+        <p class="muted" id="instrument-count">3 instruments selected</p>
+    </div>
+
+    <div style="margin-top:24px;">
         <button class="button" id="generate-button"
                 type="button" onclick="submitPrompt()">
             ✦ GENERATE MUSIC
         </button>
+        <p id="prompt-status" class="muted status-message">
+            Your description and generation settings will be saved with your creation.
+        </p>
     </div>
-
-    <p id="prompt-status" class="muted status-message">
-        Your description will be saved with your creation.
-        The current MuseGAN generates music independently of the text.
-    </p>
 </section>
 
-<div class="grid two">
+<div class="grid two" style="margin-top:24px;">
 
     <section class="card">
         <div class="eyebrow">PROMPT INSPIRATION</div>
@@ -63,12 +134,10 @@
     <section class="card">
         <div class="eyebrow">ARRANGEMENT</div>
         <h2>Your music tracks</h2>
-
-        <div class="track"><span>● &nbsp; Melody</span><span>TRACK 01</span></div>
-        <div class="track"><span>● &nbsp; Bridge</span><span>TRACK 02</span></div>
-        <div class="track"><span>● &nbsp; Piano</span><span>TRACK 03</span></div>
-
-        <p class="muted">Three-track instrumental arrangement.</p>
+        <div class="track"><span>● &nbsp; Instrument 1</span><span>TRACK 01</span></div>
+        <div class="track"><span>● &nbsp; Instrument 2</span><span>TRACK 02</span></div>
+        <div class="track"><span>● &nbsp; Instrument 3</span><span>TRACK 03</span></div>
+        <p class="muted">Choose up to three instruments for your arrangement.</p>
     </section>
 
 </div>
@@ -93,11 +162,27 @@ const promptBox = document.getElementById("prompt");
 const count = document.getElementById("char-count");
 const status = document.getElementById("prompt-status");
 const generateButton = document.getElementById("generate-button");
+const instrumentBoxes = Array.from(
+    document.querySelectorAll('input[name="instrument"]')
+);
 
 promptBox.addEventListener("input", () => {
     count.textContent =
         promptBox.value.length + " / 1000 characters";
 });
+
+function updateInstrumentCount() {
+    const selected = instrumentBoxes.filter(box => box.checked);
+
+    document.getElementById("instrument-count").textContent =
+        selected.length + " instruments selected";
+}
+
+instrumentBoxes.forEach(box => {
+    box.addEventListener("change", updateInstrumentCount);
+});
+
+updateInstrumentCount();
 
 function usePrompt(value) {
     promptBox.value = value;
@@ -114,6 +199,25 @@ async function submitPrompt() {
         return;
     }
 
+    const instruments = instrumentBoxes
+        .filter(box => box.checked)
+        .map(box => box.value);
+
+    if (instruments.length < 1) {
+        status.textContent =
+            "Please select at least one instrument.";
+        return;
+    }
+
+    const settings = {
+        prompt: value,
+        genre: document.getElementById("genre").value,
+        mood: document.getElementById("mood").value,
+        tempo: Number(document.getElementById("tempo").value),
+        duration: Number(document.getElementById("duration").value),
+        instruments: instruments
+    };
+
     generateButton.disabled = true;
     generateButton.textContent = "GENERATING...";
     status.textContent =
@@ -125,10 +229,7 @@ async function submitPrompt() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                prompt: value,
-                tempo: 120
-            })
+            body: JSON.stringify(settings)
         });
 
         const result = await response.json();
@@ -145,21 +246,24 @@ async function submitPrompt() {
 
         audio.src = result.audio_url;
         audio.load();
-
         midiDownload.href = result.midi_url;
 
         document.getElementById("result-title").textContent =
             "Your composition is ready!";
 
+        const noteSummary = instruments.map((name, index) =>
+            name + ": " + (result.track_notes[index] || 0) + " notes"
+        ).join(" | ");
+
         document.getElementById("result-details").textContent =
-            "Duration: " + result.duration + " seconds | " +
-            "Active cells: " + result.active_cells +
-            " | Melody: " + result.track_notes[0] +
-            " | Bridge: " + result.track_notes[1] +
-            " | Piano: " + result.track_notes[2];
+            "Genre: " + result.genre +
+            " | Mood: " + result.mood +
+            " | Tempo: " + result.tempo + " BPM" +
+            " | Duration: " + result.duration + " seconds" +
+            " | Instruments: " + instruments.join(", ") +
+            " | " + noteSummary;
 
         resultCard.style.display = "block";
-
         status.textContent =
             "Generation successful! Your composition is ready to play.";
 
