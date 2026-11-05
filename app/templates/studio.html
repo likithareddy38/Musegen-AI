@@ -232,7 +232,20 @@ async function submitPrompt() {
             body: JSON.stringify(settings)
         });
 
-        const result = await response.json();
+        const responseText = await response.text();
+        let result = {};
+
+        try {
+            result = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+            const details = responseText
+                ? responseText.slice(0, 300)
+                : "The server returned an empty response.";
+
+            throw new Error(
+                `Server error (HTTP ${response.status}): ${details}`
+            );
+        }
 
         if (!response.ok || !result.success) {
             throw new Error(

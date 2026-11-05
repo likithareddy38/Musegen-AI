@@ -1,4 +1,3 @@
-
 import os
 import json
 from datetime import datetime
@@ -9,14 +8,17 @@ GENERATED_DIR = os.path.join(
 )
 HISTORY_FILE = os.path.join(GENERATED_DIR, "creation_history.json")
 
+
 def load_creation_history():
     if not os.path.exists(HISTORY_FILE):
         return []
+
     try:
         with open(HISTORY_FILE, "r") as file:
             return json.load(file)
     except (json.JSONDecodeError, OSError):
         return []
+
 
 def save_creation(prompt, tempo, result):
     os.makedirs(GENERATED_DIR, exist_ok=True)
@@ -27,6 +29,9 @@ def save_creation(prompt, tempo, result):
         "title": f"Musegen Composition {len(history) + 1}",
         "prompt": prompt,
         "tempo": int(tempo),
+        "genre": result.get("genre", "Classical"),
+        "mood": result.get("mood", "Happy"),
+        "instruments": result.get("instruments", ["Piano"]),
         "midi_filename": result["midi_filename"],
         "wav_filename": result["wav_filename"],
         "duration": result["duration"],
